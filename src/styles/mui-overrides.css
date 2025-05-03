@@ -1,0 +1,9 @@
+/* Hide non-quarter-hour minute options in MUI DateTimePicker */
+.MuiClockNumber-root[aria-label]:not([aria-label="0"]):not([aria-label="15"]):not([aria-label="30"]):not([aria-label="45"]) {
+  display: none !important;
+}
+
+/* Hide non-quarter-hour minute options in the dropdown list (desktop picker) */
+.MuiMultiSectionDigitalClockSection-root[aria-label="minutes"] .MuiMultiSectionDigitalClockSection-item:not(:nth-child(1)):not(:nth-child(4)):not(:nth-child(7)):not(:nth-child(10)) {
+  display: none !important;
+} 

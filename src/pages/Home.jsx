@@ -255,18 +255,10 @@ const Home = () => {
               overflow: 'hidden'
             }}
           >
-            {/* Search Bar - now its own row */}
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 1,
-                p: 1.25,
-                borderBottom: 1,
-                borderColor: 'divider',
-              }}
-            >
-              <Box sx={{ flex: 1, minWidth: 0 }}>
+            {/* MOBILE SEARCH/FILTER UI */}
+            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+              {/* Row 1: Search bar */}
+              <Box sx={{ p: 1.5 }}>
                 <LocationSearch
                   value={selectedLocation?.address || ''}
                   onLocationSelect={(location) => {
@@ -281,136 +273,185 @@ const Home = () => {
                   hideLabel
                   placeholder={selectedLocation ? "Change location..." : "Search for a location..."}
                   sx={{
+                    width: '100%',
                     '& .MuiOutlinedInput-root': {
-                      height: { xs: 44, sm: 40 },
-                      fontSize: { xs: '1.05rem', sm: '1rem' },
+                      height: 44,
+                      fontSize: '1.05rem',
                     },
                   }}
                 />
-                {selectedLocation && (
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      mt: 1,
-                      color: 'text.secondary',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1
-                    }}
-                  >
-                    <LocationOnIcon fontSize="small" />
-                    <span>Filtering events near {selectedLocation.address}</span>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setSelectedLocation(null);
-                        setViewport({
-                          latitude: 30.2672,
-                          longitude: -97.7431,
-                          zoom: 12
-                        });
-                      }}
-                      sx={{ ml: 1 }}
-                    >
-                      Clear
-                    </Button>
-                  </Typography>
-                )}
               </Box>
-              {/* New row for radius and view toggle */}
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                gap: 2,
-                mt: 0.5,
-                width: '100%',
-                bgcolor: '#f5f7fa',
-                borderRadius: '10px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                px: { xs: 1, sm: 1.5 },
-                py: { xs: 0.5, sm: 1 },
-              }}>
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
-                  <FormControl variant="outlined" size="small" sx={{ minWidth: 150, borderRadius: '12px', mb: 0, width: 150 }}>
-                    <InputLabel id="radius-label" sx={{ fontWeight: 500, color: 'text.secondary', fontSize: '0.95rem' }}>Radius</InputLabel>
-                    <Select
-                      labelId="radius-label"
-                      value={radius}
-                      onChange={e => setRadius(Number(e.target.value))}
-                      label="Radius"
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: '1.08rem',
-                        borderRadius: '12px',
-                        bgcolor: 'white',
-                        px: 1.5,
-                        height: 38,
-                        minHeight: 38,
-                        display: 'flex',
-                        alignItems: 'center',
-                        '.MuiSelect-select': {
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        },
-                      }}
-                      MenuProps={{
-                        PaperProps: {
-                          sx: { borderRadius: '12px' }
-                        }
-                      }}
-                    >
-                      <MenuItem value={5}><span style={{fontWeight:600}}>5 mi</span></MenuItem>
-                      <MenuItem value={10}><span style={{fontWeight:600}}>10 mi</span></MenuItem>
-                      <MenuItem value={25}><span style={{fontWeight:600}}>25 mi</span></MenuItem>
-                      <MenuItem value={50}><span style={{fontWeight:600}}>50 mi</span></MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flex: 1 }}>
-                  <ToggleButtonGroup
-                    value={viewMode}
-                    exclusive
-                    onChange={(e, newValue) => {
-                      if (newValue === 'map' && !hasMapboxToken) {
-                        alert('Map view requires a Mapbox token. Please set VITE_MAPBOX_ACCESS_TOKEN in your .env file.');
-                        return;
-                      }
-                      newValue && setViewMode(newValue);
-                    }}
-                    size="small"
+              {/* Row 2: Radius selector + List/Map toggle in one row */}
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1.5, px: 1.5, pb: 1 }}>
+                <FormControl fullWidth variant="outlined" size="small" sx={{ flex: 1 }}>
+                  <Select
+                    displayEmpty
+                    value={radius || ''}
+                    onChange={e => setRadius(Number(e.target.value))}
                     sx={{
-                      gap: 1,
-                      '& .MuiToggleButton-root': {
-                        border: 'none',
-                        borderRadius: '8px !important',
-                        px: 1.5,
-                        py: 0.7,
-                        fontSize: { xs: '1.05rem', sm: '1rem' },
-                        transition: 'background 0.15s',
-                        '&.Mui-selected': {
-                          backgroundColor: 'primary.main',
-                          color: 'white',
-                          '&:hover': {
-                            backgroundColor: 'primary.dark',
-                          },
+                      borderRadius: '16px',
+                      bgcolor: 'white',
+                      fontWeight: 600,
+                      fontSize: '1.1rem',
+                      height: 44,
+                      width: '100%',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                    }}
+                    renderValue={selected => selected ? `${selected} mi` : 'Radius'}
+                  >
+                    <MenuItem value={5}>5 mi</MenuItem>
+                    <MenuItem value={10}>10 mi</MenuItem>
+                    <MenuItem value={25}>25 mi</MenuItem>
+                    <MenuItem value={50}>50 mi</MenuItem>
+                  </Select>
+                </FormControl>
+                <ToggleButtonGroup
+                  value={viewMode}
+                  exclusive
+                  onChange={(e, newValue) => {
+                    if (newValue === 'map' && !hasMapboxToken) {
+                      alert('Map view requires a Mapbox token. Please set VITE_MAPBOX_ACCESS_TOKEN in your .env file.');
+                      return;
+                    }
+                    newValue && setViewMode(newValue);
+                  }}
+                  size="large"
+                  sx={{
+                    flex: 1,
+                    width: '100%',
+                    '& .MuiToggleButton-root': {
+                      border: 'none',
+                      borderRadius: '12px !important',
+                      px: 2,
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      '&.Mui-selected': {
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'primary.dark',
                         },
                       },
-                    }}
-                  >
-                    <ToggleButton value="list">
-                      <ViewListIcon />
-                    </ToggleButton>
-                    <ToggleButton value="map">
-                      <MapIcon />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </Box>
+                    },
+                  }}
+                >
+                  <ToggleButton value="list">
+                    <ViewListIcon />
+                  </ToggleButton>
+                  <ToggleButton value="map">
+                    <MapIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
               </Box>
+              {/* Row 3: Categories (unchanged) */}
             </Box>
 
-            {/* Category Tabs */}
+            {/* DESKTOP SEARCH/FILTER UI */}
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, p: 2, borderBottom: 1, borderColor: 'divider' }}>
+                {/* Search bar */}
+                <Box sx={{ flex: 2, minWidth: 0 }}>
+                  <LocationSearch
+                    value={selectedLocation?.address || ''}
+                    onLocationSelect={(location) => {
+                      setSelectedLocation(location);
+                      setViewport({
+                        ...viewport,
+                        latitude: location.coordinates[1],
+                        longitude: location.coordinates[0],
+                        zoom: 14
+                      });
+                    }}
+                    hideLabel
+                    placeholder={selectedLocation ? "Change location..." : "Search for a location..."}
+                    sx={{
+                      width: '100%',
+                      '& .MuiOutlinedInput-root': {
+                        height: 44,
+                        fontSize: '1.05rem',
+                      },
+                    }}
+                  />
+                </Box>
+                {/* Radius selector */}
+                <FormControl variant="outlined" size="small" sx={{ minWidth: 140, borderRadius: '12px', width: 140 }}>
+                  <InputLabel id="radius-label" sx={{ fontWeight: 500, color: 'text.secondary', fontSize: '0.95rem' }}>Radius</InputLabel>
+                  <Select
+                    labelId="radius-label"
+                    value={radius}
+                    onChange={e => setRadius(Number(e.target.value))}
+                    label="Radius"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: '1.08rem',
+                      borderRadius: '12px',
+                      bgcolor: 'white',
+                      px: 1.5,
+                      height: 38,
+                      minHeight: 38,
+                      display: 'flex',
+                      alignItems: 'center',
+                      '.MuiSelect-select': {
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      },
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: { borderRadius: '12px' }
+                      }
+                    }}
+                  >
+                    <MenuItem value={5}><span style={{fontWeight:600}}>5 mi</span></MenuItem>
+                    <MenuItem value={10}><span style={{fontWeight:600}}>10 mi</span></MenuItem>
+                    <MenuItem value={25}><span style={{fontWeight:600}}>25 mi</span></MenuItem>
+                    <MenuItem value={50}><span style={{fontWeight:600}}>50 mi</span></MenuItem>
+                  </Select>
+                </FormControl>
+                {/* List/Map toggle */}
+                <ToggleButtonGroup
+                  value={viewMode}
+                  exclusive
+                  onChange={(e, newValue) => {
+                    if (newValue === 'map' && !hasMapboxToken) {
+                      alert('Map view requires a Mapbox token. Please set VITE_MAPBOX_ACCESS_TOKEN in your .env file.');
+                      return;
+                    }
+                    newValue && setViewMode(newValue);
+                  }}
+                  size="small"
+                  sx={{
+                    gap: 1,
+                    '& .MuiToggleButton-root': {
+                      border: 'none',
+                      borderRadius: '8px !important',
+                      px: 1.5,
+                      py: 0.7,
+                      fontSize: { xs: '1.05rem', sm: '1rem' },
+                      transition: 'background 0.15s',
+                      '&.Mui-selected': {
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'primary.dark',
+                        },
+                      },
+                    },
+                  }}
+                >
+                  <ToggleButton value="list">
+                    <ViewListIcon />
+                  </ToggleButton>
+                  <ToggleButton value="map">
+                    <MapIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+              {/* Row 2: Categories (unchanged) */}
+            </Box>
+
+            {/* Category Tabs (shared by both mobile and desktop) */}
             <Tabs
               value={selectedCategory}
               onChange={(e, newValue) => setSelectedCategory(newValue)}
